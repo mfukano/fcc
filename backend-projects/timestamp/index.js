@@ -37,10 +37,13 @@ app.get("/api/:date", function (req, res) {
 
 function valiDate(dateString) {
   const hasNums = dateString.match(/[0-9]+/g);
+  const weirdChars = dateString.match(
+    /[\{\}\$\@\!\^\&\*\<\>\_\(\)\[\]\"\'\/]+/g,
+  );
   const invalid = "Invalid Date";
 
   // dates have numbers because numbers mean things
-  if (!hasNums) {
+  if (!hasNums || weirdChars) {
     return { error: invalid };
   }
 
