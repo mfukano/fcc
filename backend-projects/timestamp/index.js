@@ -1,7 +1,3 @@
-// index.js
-// where your node app starts
-
-// init project
 var express = require("express");
 var app = express();
 
@@ -10,17 +6,19 @@ var app = express();
 var cors = require("cors");
 app.use(cors({ optionsSuccessStatus: 200 })); // some legacy browsers choke on 204
 
-// http://expressjs.com/en/starter/static-files.html
 app.use(express.static("public"));
 
-// http://expressjs.com/en/starter/basic-routing.html
 app.get("/", function (req, res) {
   res.sendFile(__dirname + "/views/index.html");
 });
 
-// your first API endpoint...
-app.get("/api/hello", function (req, res) {
-  res.json({ greeting: "hello API" });
+app.get("/api/", function (req, res) {
+  // since request has no :date param, return current time
+  const now = new Date();
+  res.json({
+    unix: now.valueOf(),
+    utc: now.toUTCString(),
+  });
 });
 
 app.get("/api/:date", function (req, res) {
@@ -28,13 +26,6 @@ app.get("/api/:date", function (req, res) {
   console.log(`/api/:date received query param: ${date}`);
 
   let valiDated = valiDate(date);
-  if (valiDated.error) {
-    res.json({
-      error: valiDated.error,
-    });
-    return;
-  }
-
   console.log(`res.json(${JSON.stringify(valiDated)})`);
   res.json(valiDated);
 });
@@ -43,16 +34,22 @@ function valiDate(dateString) {
   // timestamp validation
   const dateNum = parseInt(dateString);
   const dateNumAsDate = new Date(dateNum);
-  if (dateNum === dateNumAsDate.valueOf()) {
+  if (
+    dateNumAsDate.valueOf().toString().length == dateString.length &&
+    dateNum === dateNumAsDate.valueOf()
+  ) {
     return { unix: dateNumAsDate.valueOf(), utc: dateNumAsDate.toUTCString() };
   }
 
   // timestamp validation failed, fall back to Date(dateString) coercion
   const date = new Date(dateString);
+
+  // it's not a timestamp and it failed Date() coercion, so return an error
   if (date === "Invalid Date") {
     return { error: date };
   }
 
+  // at this point, Date(dateString) coercion should have succeeded
   return { unix: date.valueOf(), utc: date.toUTCString() };
 }
 
