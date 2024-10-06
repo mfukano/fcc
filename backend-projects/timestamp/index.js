@@ -26,15 +26,25 @@ app.get("/api/:date", function (req, res) {
   console.log(`/api/:date received query param: ${date}`);
 
   let valiDated = valiDate(date);
+
   console.log(`res.json(${JSON.stringify(valiDated)})`);
   res.json(valiDated);
 });
 
 function valiDate(dateString) {
+  const hasNums = dateString.match(/[0-9]+/g);
+  const invalid = "Invalid Date";
+
+  // dates have numbers because numbers mean things
+  if (!hasNums) {
+    return { error: invalid };
+  }
+
   // timestamp validation
   const dateNum = parseInt(dateString);
   const dateNumAsDate = new Date(dateNum);
   if (
+    !isNaN(dateNum) &&
     dateNumAsDate.valueOf().toString().length == dateString.length &&
     dateNum === dateNumAsDate.valueOf()
   ) {
@@ -45,8 +55,8 @@ function valiDate(dateString) {
   const date = new Date(dateString);
 
   // it's not a timestamp and it failed Date() coercion, so return an error
-  if (date === "Invalid Date") {
-    return { error: date };
+  if (date == invalid) {
+    return { error: invalid };
   }
 
   // at this point, Date(dateString) coercion should have succeeded
