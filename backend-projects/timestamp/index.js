@@ -25,50 +25,35 @@ app.get("/api/hello", function (req, res) {
 
 app.get("/api/:date", function (req, res) {
   let date = req.params.date;
-  let result = {
-    utc: null,
-    unix: null,
-  };
-  console.log(`in date api, with param: ${date}`);
+  console.log(`/api/:date received query param: ${date}`);
 
   let valiDated = valiDate(date);
-  if (!valiDated) {
+  if (valiDated.error) {
     res.json({
-      error: "Invalid Date",
+      error: valiDated.error,
     });
     return;
   }
 
-  result.utc = valiDated.toUTCString();
-  result.unix = valiDated.valueOf();
-
-  console.log(`result: ${JSON.stringify(result)}`);
-
-  res.json(result);
+  console.log(`res.json(${JSON.stringify(valiDated)})`);
+  res.json(valiDated);
 });
 
 function valiDate(dateString) {
-  // check if we have a unix timestamp
-  console.log(`check dateString: ${dateString} ${typeof dateString}`);
-  //let date = new Date(parseInt(dateString));
-
-  // timestamp received is the same when converted into a UTC timestamp
-  /* 
-  if (date.valueOf() == parseInt(dateString)) {
-    return date;
+  // timestamp validation
+  const dateNum = parseInt(dateString);
+  const dateNumAsDate = new Date(dateNum);
+  if (dateNum === dateNumAsDate.valueOf()) {
+    return { unix: dateNumAsDate.valueOf(), utc: dateNumAsDate.toUTCString() };
   }
-*/
-  // check if we received a valid datestring format
-  date = new Date(dateString);
 
-  console.log(`in valiDate, checking date created: ${date}`);
-
+  // timestamp validation failed, fall back to Date(dateString) coercion
+  const date = new Date(dateString);
   if (date === "Invalid Date") {
-    return null;
+    return { error: date };
   }
 
-  console.log(`input was valid, returning date: ${JSON.stringify(date)}`);
-  return date;
+  return { unix: date.valueOf(), utc: date.toUTCString() };
 }
 
 // Listen on port set in environment variable or default to 3000
