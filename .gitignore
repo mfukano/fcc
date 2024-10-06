@@ -1,0 +1,6 @@
+node_modules/
+.env
+
+# other project directories
+fcc-express/
+fcc-mongo/
