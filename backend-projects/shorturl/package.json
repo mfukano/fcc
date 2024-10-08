@@ -1,0 +1,21 @@
+{
+  "name": "shorturl",
+  "version": "1.0.0",
+  "description": "whoami server to return server details with node",
+  "main": "index.js",
+  "scripts": {
+    "start": "node --watch index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "backend",
+    "nodejs"
+  ],
+  "author": "mat fukano",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0"
+  }
+}
