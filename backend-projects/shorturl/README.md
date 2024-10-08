@@ -1,11 +1,12 @@
-# whoami
+# shorturl
 
 ## What is this?
 
 This is a URL shortener service that maps a valid URL to an API
 path tracked by a counter on the server.
-It does _not_ connect to a database, which means the paths are only valid
-while that server instance has not been stopped or restarted.
+
+**It does _not_ connect to a database, which means the paths are only valid
+while that server instance has not been stopped or restarted.**
 
 It has two endpoints, `/api/shorturl/` and `/api/shorturl/:id`:
 
