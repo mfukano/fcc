@@ -1,23 +1,20 @@
 import * as dotenv from "dotenv";
 import mongoose from "mongoose";
+import path from "node:path";
 
 /*
  * config and connect
  * */
 
-dotenv.config({ path: path.resolve(import.meta.dirname, ".env") });
-
-mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+dotenv.config({ path: path.resolve(import.meta.dirname, "../.env") });
+mongoose.connect(process.env.MONGO_URI);
 
 /*
  * schemas and model setup
  * */
 
 const userSchema = new mongoose.Schema({
-  name: String,
+  username: String,
 });
 
 const exerciseType = {
@@ -25,7 +22,7 @@ const exerciseType = {
   description: String,
   duration: Number,
   date: String,
-  _id: String,
+  userId: String,
 };
 
 const exerciseSchema = new mongoose.Schema(exerciseType);
@@ -37,51 +34,80 @@ let Exercise = mongoose.model("Exercise", exerciseSchema);
  * db access functions
  **/
 
-const createAndSaveUser = (name, done) => {
-  const user = new User({
-    name,
-  });
-  user.save((err, createdUser) => handleCallback(done, err, createdUser));
+const createAndSaveUser = (username, done) => {
+  console.log(`check received username: ${username}`);
+  new User({ username })
+    .save()
+    .then((createdUser) => handleCallback(done, createdUser))
+    .catch((err) => logErr(err));
 };
 
 const findUsersByName = (userName, done) => {
   const filter = { name: userName };
-  User.find(filter, (err, foundUsers) => handleCallback(done, err, foundUsers));
+  User.find(filter)
+    .then((foundUsers) => handleCallback(foundUsers))
+    .catch((err) => logErr(err));
 };
 
 const findUserById = (userId, done) => {
-  User.findById({ _id: userId }, (err, foundUser) =>
-    handleCallback(done, err, foundUser),
-  );
+  User.findById({ _id: userId })
+    .select("_id username")
+    .then((foundUser) => handleCallback(done, foundUser._doc))
+    .catch((err) => logErr(err));
 };
 
 const createAndSaveExercise = (
-  { username, description, duration, date, userId },
+  { username, description, duration, date, _id },
   done,
 ) => {
   const exercise = new Exercise({
-    _id: userId,
+    userId: _id,
     username,
     description,
     duration,
     date,
   });
-  exercise.save((err, savedExercise) =>
-    handleCallback(done, err, savedExercise),
-  );
+  console.log(`check exercise before save: ${JSON.stringify(exercise)}`);
+  exercise
+    .save()
+    .then((savedExercise) => handleCallback(done, savedExercise))
+    .catch((err) => logErr(err));
 };
 
-const findExercisesById = (userId, done) => {
-  const filter = { _id: userId };
-  Exercise.find(filter, (err, foundExercises) =>
-    handleCallback(done, err, foundExercises),
-  );
+/**
+ * findExercisesById takes a userId, and requests all Exercises by { _id: userId }.
+ * This is the format the exercise expects Exercises are partitioned by.
+ *
+ * This needs to be modified for receiving parameter filters:
+ * - [from, to]: Date   --  Date constraints for returned Exercises
+ * - limit: Number      --  Limit constraint on returned number of records
+ *
+ * @param userId - MongoDB User _id
+ * @returns [Exercise] for shaping into a user's exercise log
+ */
+const findExercisesById = (userId, requestParams, done) => {
+  const { fromDate, toDate, limit } = requestParams;
+  // This should create new objects for either parameter and fill them accordingly;
+  // toDate might act weird if filter.date is null but I should test.
+  const filter = { userId };
+  console.log(`check filter: ${JSON.stringify(filter.userId)}`);
+  if (fromDate) {
+    filter.date = { $gte: ISODate(fromDate) };
+  }
+  if (toDate) {
+    filter.date = { ...filter.date, $lte: ISODate(toDate) };
+  }
+
+  Exercise.find(filter)
+    .limit(limit ? limit : Number.MAX_VALUE)
+    .select("date duration description -_id")
+    .then((err, foundExercises) => handleCallback(done, err, foundExercises));
 };
 
 /* helper functions */
 
-const handleCallback = (done, err, data) => {
-  logErr(err);
+const handleCallback = (done, data) => {
+  console.log(`logging received data: ${JSON.stringify(data)}`);
   done(null, data);
 };
 
@@ -93,4 +119,10 @@ const logErr = (err) => {
  * exports
  **/
 
-export { createAndSaveUser, findUsersByName, findUserById };
+export {
+  createAndSaveUser,
+  findUsersByName,
+  findUserById,
+  createAndSaveExercise,
+  findExercisesById,
+};
