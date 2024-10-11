@@ -2,28 +2,18 @@ import * as dotenv from "dotenv";
 import express from "express";
 import cors from "cors";
 import path from "node:path";
-
 import user from "./api/user.js";
 
 dotenv.config({ path: path.resolve(import.meta.dirname, ".env") });
 
 const PORT = 3000;
-const TIMEOUT = 10000;
 const app = express();
 
-app.use(cors());
+app.use(express.urlencoded({ extended: "true" }));
+app.use(express.json());
 
-app.use((req, res, next) => {
-  setTimeout;
-  let t = setTimeout(() => {
-    // can try below line instead to see how it interplays with requests
-    // next({ message: "timeout" });
-
-    console.log(`Request has timed out.`);
-    res.send(408);
-  }, TIMEOUT);
-  next();
-});
+// cors later hehe
+// app.use(cors());
 
 /**
  *   I want to hide any requests to the .env file that the server itself isn't making
@@ -45,7 +35,7 @@ app.get("/", (req, res) => {
 });
 
 /*  import route files  */
-app.get("/api/user", user);
+app.use("/api/users", user);
 
 const listener = app.listen(process.env.PORT || PORT, () => {
   console.log("Your app is listening on port " + listener.address().port);
