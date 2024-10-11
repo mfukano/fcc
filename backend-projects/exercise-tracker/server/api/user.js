@@ -9,9 +9,6 @@ import {
 const router = express.Router();
 const ERROR_MSG = "There was an error in the API request.";
 
-router.use(express.urlencoded({ extended: true }));
-router.use(express.json());
-
 router.get("/:_id", (req, res, next) => {
   let t = handleTimeout(next);
   findUserById(req.params._id, (err, user) => {
