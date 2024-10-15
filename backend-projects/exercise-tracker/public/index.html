@@ -3,8 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title></title>
+    <title>💪 Exercise Tracker</title>
     <link href="style.css" type="text/css" rel="stylesheet" />
+    <script src="index.js" type="text/javascript"></script>
   </head>
   <body>
     <div class="container">
@@ -43,7 +44,7 @@
         />
         <button>Submit</button>
       </form>
-      <form action="/api/users/:_id/logs" id="logs-form" method="get">
+      <form action="/api/users/" id="logs-form" method="get">
         <div class="endpoint-docs">
           <h2>Search logs</h2>
           <p>
@@ -55,31 +56,16 @@
         </div>
         <input id="user-id" type="text" name=":_id" placeholder=":_id" />
         <input
-          id="from-date"
+          id="from"
           type="text"
-          name="date"
+          name="from"
           placeholder="date (yyyy-mm-dd)"
         />
-        <input
-          id="to-date"
-          type="text"
-          name="date"
-          placeholder="date (yyyy-mm-dd)"
-        />
+        <input id="to" type="text" name="to" placeholder="date (yyyy-mm-dd)" />
         <input id="limit" type="number" name="limit" placeholder="2" />
         <button>Submit</button>
       </form>
       <div id="logs-container"></div>
     </div>
-    <script>
-      const exerciseForm = document.getElementById("exercise-form");
-
-      exerciseForm.addEventListener("submit", () => {
-        const userId = document.getElementById("uid").value;
-        exerciseForm.action = `/api/users/${userId}/exercises`;
-
-        exerciseForm.submit();
-      });
-    </script>
   </body>
 </html>
