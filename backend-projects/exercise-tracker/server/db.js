@@ -21,7 +21,7 @@ const exerciseType = {
   username: String,
   description: String,
   duration: Number,
-  date: String,
+  date: Date,
   userId: String,
 };
 
@@ -93,16 +93,31 @@ const createAndSaveExercise = (
  */
 const findExercisesById = (userId, requestParams, done) => {
   const { fromDate, toDate, limit } = requestParams;
+  let filter;
   // This should create new objects for either parameter and fill them accordingly;
   // toDate might act weird if filter.date is null but I should test.
-  const filter = { userId };
-  console.log(`check filter: ${JSON.stringify(filter.userId)}`);
-  if (fromDate) {
-    filter.date = { $gte: ISODate(fromDate) };
+  if (fromDate && toDate) {
+    filter = {
+      $or: [
+        {
+          $and: [
+            { date: { $gte: new Date(fromDate).toISOString() } },
+            { date: { $lte: new Date(toDate).toISOString() } },
+          ],
+        },
+        { userId },
+      ],
+    };
+  } else {
+    filter = { userId };
+    if (fromDate) {
+      filter.date = { $gte: new Date(fromDate).toISOString() };
+    }
+    if (toDate) {
+      filter.date = { $lte: new Date(toDate).toISOString() };
+    }
   }
-  if (toDate) {
-    filter.date = { ...filter.date, $lte: ISODate(toDate) };
-  }
+  console.log(`filter: ${JSON.stringify(filter)}`);
 
   Exercise.find(filter)
     .limit(limit ? limit : Number.MAX_VALUE)
