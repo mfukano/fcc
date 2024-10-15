@@ -12,6 +12,15 @@ const app = express();
 app.use(express.urlencoded({ extended: "true" }));
 app.use(express.json());
 
+// this works for now but if I want to make the front-end stateful I should probably not make it static
+app.use(express.static("public"));
+
+/*
+app.get("/", function (req, res) {
+  res.sendFile(path.resolve(import.meta.dirname, "../public", "index.html"));
+});
+*/
+
 // cors later hehe
 // app.use(cors());
 
