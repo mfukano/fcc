@@ -42,10 +42,16 @@ const createAndSaveUser = (username, done) => {
     .catch((err) => logErr(err));
 };
 
+const findAllUsers = (done) => {
+  User.find()
+    .then((foundUsers) => handleCallback(done, foundUsers))
+    .catch((err) => logErr(err));
+};
+
 const findUsersByName = (userName, done) => {
   const filter = { name: userName };
   User.find(filter)
-    .then((foundUsers) => handleCallback(foundUsers))
+    .then((foundUsers) => handleCallback(done, foundUsers))
     .catch((err) => logErr(err));
 };
 
@@ -121,6 +127,7 @@ const logErr = (err) => {
 
 export {
   createAndSaveUser,
+  findAllUsers,
   findUsersByName,
   findUserById,
   createAndSaveExercise,

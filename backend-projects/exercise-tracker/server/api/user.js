@@ -2,12 +2,29 @@ import express from "express";
 import {
   createAndSaveUser,
   createAndSaveExercise,
+  findAllUsers,
   findUserById,
   findExercisesById,
 } from "../db.js";
 
 const router = express.Router();
 const ERROR_MSG = "There was an error in the API request.";
+
+// should return list of users
+router.get("/", (req, res, next) => {
+  let t = handleTimeout(next);
+  findAllUsers((err, users) => {
+    clearTimeout(t);
+    if (err) {
+      return next(err);
+    }
+    if (!users) {
+      console.log(`GET /api/users/ :: ${ERROR_MSG}`);
+      return next({ message: ERROR_MSG });
+    }
+    res.json(users);
+  });
+});
 
 router.get("/:_id", (req, res, next) => {
   let t = handleTimeout(next);

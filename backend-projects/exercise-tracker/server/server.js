@@ -15,6 +15,22 @@ app.use(express.json());
 // this works for now but if I want to make the front-end stateful I should probably not make it static
 app.use(express.static("public"));
 
+const enableCORS = function (req, res, next) {
+  if (!process.env.DISABLE_XORIGIN) {
+    const allowedOrigins = ["https://www.freecodecamp.org"];
+    const origin = req.headers.origin;
+    if (!process.env.XORIGIN_RESTRICT || allowedOrigins.indexOf(origin) > -1) {
+      console.log(req.method);
+      res.set({
+        "Access-Control-Allow-Origin": origin,
+        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+        "Access-Control-Allow-Headers":
+          "Origin, X-Requested-With, Content-Type, Accept",
+      });
+    }
+  }
+  next();
+};
 /*
 app.get("/", function (req, res) {
   res.sendFile(path.resolve(import.meta.dirname, "../public", "index.html"));
@@ -22,7 +38,6 @@ app.get("/", function (req, res) {
 */
 
 // cors later hehe
-// app.use(cors());
 
 /**
  *   I want to hide any requests to the .env file that the server itself isn't making
@@ -44,7 +59,7 @@ app.get("/", (req, res) => {
 });
 
 /*  import route files  */
-app.use("/api/users", user);
+app.use("/api/users", enableCORS, user);
 
 const listener = app.listen(process.env.PORT || PORT, () => {
   console.log("Your app is listening on port " + listener.address().port);
