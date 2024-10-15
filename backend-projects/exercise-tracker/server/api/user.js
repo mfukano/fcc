@@ -114,10 +114,13 @@ router.get("/:id/logs", (req, res, next) => {
     }
     try {
       const requestParams = {
-        fromDate: req.params.from,
-        toDate: req.params.to,
-        limit: req.params.limit,
+        fromDate: req.query.from,
+        toDate: req.query.to,
+        limit: req.query.limit,
       };
+      console.log(
+        `check requestParams before find by filters: ${JSON.stringify(requestParams)}`,
+      );
       findExercisesById(user._id, requestParams, (err, exercises) => {
         clearTimeout(t);
         if (err) {
