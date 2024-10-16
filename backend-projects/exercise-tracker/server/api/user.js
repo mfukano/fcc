@@ -84,7 +84,7 @@ router.post("/:id/exercises", (req, res, next) => {
         _id: user._id,
         description,
         duration,
-        date: date || new Date(),
+        date: new Date(date) || new Date(),
       };
       createAndSaveExercise(requestParams, (err, data) => {
         clearTimeout(t);
@@ -99,8 +99,7 @@ router.post("/:id/exercises", (req, res, next) => {
           return next({ message: postError });
         }
 
-        requestParams.date = requestParams.date.toDateString();
-        res.json(requestParams);
+        res.json({ ...requestParams, date: requestParams.date.toDateString() });
       });
     } catch (err) {
       return next(err);
