@@ -57,9 +57,9 @@ const findUsersByName = (userName, done) => {
 };
 
 const findUserById = (userId, done) => {
-  User.findById({ _id: userId })
+  User.findById(userId)
     .select("_id username")
-    .then((foundUser) => handleCallback(done, foundUser._doc, "findUserById"))
+    .then((foundUser) => handleCallback(done, foundUser, "findUserById"))
     .catch((err) => logErr(err));
 };
 

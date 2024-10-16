@@ -26,9 +26,9 @@ router.get("/", (req, res, next) => {
   });
 });
 
-router.get("/:_id", (req, res, next) => {
+router.get("/:id", (req, res, next) => {
   let t = handleTimeout(next);
-  findUserById(req.params._id, (err, user) => {
+  findUserById(req.params.id, (err, user) => {
     clearTimeout(t);
     if (err) {
       return next(err);
@@ -79,9 +79,10 @@ router.post("/", (req, res, next) => {
 router.post("/:id/exercises", (req, res, next) => {
   let t = handleTimeout(next);
   findUserById(req.params.id, (err, user) => {
-    if (err) {
+    if (err || !user) {
       return next(err);
     }
+
     try {
       const { description, duration, date } = req.body;
       const dateValidateErr = date ? validateDate(date) : null;
@@ -92,11 +93,18 @@ router.post("/:id/exercises", (req, res, next) => {
         if (dateValidateErr) return next(dateValidateErr);
       }
 
+      // expecting to need to extract user._doc
+      console.log(`check user before post: ${JSON.stringify(user)}`);
+
+      if (!user && (user.username || !user._id)) {
+        return next("Couldn't get username or _id from requested ID");
+      }
+
       const requestParams = {
         username: user.username,
         _id: user._id,
         description,
-        duration,
+        duration: parseInt(duration),
         date: date ? new Date(date) : new Date(),
       };
       createAndSaveExercise(requestParams, (err, data) => {
@@ -111,6 +119,8 @@ router.post("/:id/exercises", (req, res, next) => {
           console.error(postError);
           return next({ message: postError });
         }
+
+        console.log(`check data: ${JSON.stringify(data)}`);
 
         const copiedData = {
           ...data._doc,
@@ -137,13 +147,16 @@ ${JSON.stringify(copiedData)}
 router.get("/:id/logs", (req, res, next) => {
   let t = handleTimeout(next);
   findUserById(req.params.id, (err, user) => {
-    if (err) {
+    if (err || !user) {
       return next(err);
     }
+
+    user = user._doc;
+
     try {
       const requestParams = {
-        fromDate: req.query.from,
-        toDate: req.query.to,
+        fromDate: req.query.from ? req.query.from : null,
+        toDate: req.query.to ? req.query.from : null,
         limit: req.query.limit,
       };
 
@@ -218,7 +231,7 @@ const validateString = (str) => {
   if (!str) {
     return "Missing required string";
   }
-  if (str && str.match(/[^a-zA-Z0-9\_\-:]/g)) {
+  if (str && str.match(/[^a-zA-Z0-9\_\-\ :]/g)) {
     return "Some string param is not valid";
   }
 
