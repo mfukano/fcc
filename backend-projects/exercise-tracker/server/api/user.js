@@ -71,7 +71,6 @@ router.post("/", (req, res, next) => {
       if (err) {
         return next(err);
       }
-      console.log(`returning found user: ${JSON.stringify(foundUser)}`);
       res.json(foundUser);
     });
   });
@@ -169,9 +168,6 @@ router.get("/:_id/logs", (req, res, next) => {
     user = user._doc;
 
     try {
-      console.log(
-        `check requestParams before find by filters: ${JSON.stringify(requestParams)}`,
-      );
       findExercisesById(user._id, requestParams, (err, exercises) => {
         clearTimeout(t);
         if (err) {

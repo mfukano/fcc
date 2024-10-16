@@ -117,7 +117,6 @@ const findExercisesById = (userId, requestParams, done) => {
       filter.date = { $lte: new Date(toDate) };
     }
   }
-  console.log(`filter: ${JSON.stringify(filter)}`);
 
   Exercise.find(filter)
     .select("date duration description -_id")
