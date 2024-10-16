@@ -9,6 +9,7 @@ import {
 
 const router = express.Router();
 const ERROR_MSG = "There was an error in the API request.";
+const TIME_STR = "T00:00:00";
 
 // should return list of users
 router.get("/", (req, res, next) => {
@@ -102,7 +103,7 @@ router.post("/:_id/exercises", (req, res, next) => {
       _id: user._id,
       description,
       duration: parseInt(duration),
-      date: date ? new Date(date) : new Date(),
+      date: date ? new Date(date + TIME_STR) : new Date(),
     };
 
     try {
@@ -144,8 +145,8 @@ ${JSON.stringify(copiedData)}
 
 router.get("/:_id/logs", (req, res, next) => {
   const requestParams = {
-    fromDate: req.query.from ? req.query.from : null,
-    toDate: req.query.to ? req.query.to : null,
+    fromDate: req.query.from ? req.query.from + TIME_STR : null,
+    toDate: req.query.to ? req.query.to + TIME_STR : null,
     limit: req.query.limit,
   };
   const fromValidateErr = requestParams.fromDate
