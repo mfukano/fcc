@@ -1,6 +1,5 @@
 import * as dotenv from "dotenv";
 import express from "express";
-import cors from "cors";
 import path from "node:path";
 import user from "./api/user.js";
 
@@ -8,12 +7,6 @@ dotenv.config({ path: path.resolve(import.meta.dirname, ".env") });
 
 const PORT = 3000;
 const app = express();
-
-app.use(express.urlencoded({ extended: "true" }));
-app.use(express.json());
-
-// this works for now but if I want to make the front-end stateful I should probably not make it static
-app.use(express.static("public"));
 
 const enableCORS = function (req, res, next) {
   if (!process.env.DISABLE_XORIGIN) {
@@ -31,13 +24,27 @@ const enableCORS = function (req, res, next) {
   }
   next();
 };
-/*
-app.get("/", function (req, res) {
-  res.sendFile(path.resolve(import.meta.dirname, "../public", "index.html"));
-});
-*/
 
-// cors later hehe
+const logger = (req, _, next) => {
+  console.log(`
+LOGGING MIDDLEWARE
+---------------------
+method: ${req.method}
+req.params: ${JSON.stringify(req.params)}
+req.query: ${JSON.stringify(req.query)}
+req.body: ${JSON.stringify(req.body)}
+`);
+
+  return next();
+};
+
+app.use(express.urlencoded({ extended: "true" }));
+app.use(express.json());
+
+app.use(logger);
+
+// this works for now but if I want to make the front-end stateful I should probably not make it static
+app.use(express.static("public"));
 
 /**
  *   I want to hide any requests to the .env file that the server itself isn't making

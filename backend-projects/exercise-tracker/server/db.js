@@ -38,27 +38,29 @@ const createAndSaveUser = (username, done) => {
   console.log(`check received username: ${username}`);
   new User({ username })
     .save()
-    .then((createdUser) => handleCallback(done, createdUser))
+    .then((createdUser) =>
+      handleCallback(done, createdUser, "createAndSaveUser"),
+    )
     .catch((err) => logErr(err));
 };
 
 const findAllUsers = (done) => {
   User.find()
-    .then((foundUsers) => handleCallback(done, foundUsers))
+    .then((foundUsers) => handleCallback(done, foundUsers, "findAllUsers"))
     .catch((err) => logErr(err));
 };
 
 const findUsersByName = (userName, done) => {
   const filter = { name: userName };
   User.find(filter)
-    .then((foundUsers) => handleCallback(done, foundUsers))
+    .then((foundUsers) => handleCallback(done, foundUsers, "findUsersByName"))
     .catch((err) => logErr(err));
 };
 
 const findUserById = (userId, done) => {
   User.findById({ _id: userId })
     .select("_id username")
-    .then((foundUser) => handleCallback(done, foundUser._doc))
+    .then((foundUser) => handleCallback(done, foundUser._doc, "findUserById"))
     .catch((err) => logErr(err));
 };
 
@@ -76,7 +78,9 @@ const createAndSaveExercise = (
   console.log(`check exercise before save: ${JSON.stringify(exercise)}`);
   exercise
     .save()
-    .then((savedExercise) => handleCallback(done, savedExercise))
+    .then((savedExercise) =>
+      handleCallback(done, savedExercise, "createAndSaveExercise"),
+    )
     .catch((err) => logErr(err));
 };
 
@@ -122,13 +126,18 @@ const findExercisesById = (userId, requestParams, done) => {
   Exercise.find(filter)
     .limit(limit ? limit : Number.MAX_VALUE)
     .select("date duration description -_id")
-    .then((err, foundExercises) => handleCallback(done, err, foundExercises));
+    .then((err, foundExercises) =>
+      handleCallback(done, foundExercises, "findExercisesById"),
+    );
 };
 
 /* helper functions */
 
-const handleCallback = (done, data) => {
-  console.log(`logging received data: ${JSON.stringify(data)}`);
+const handleCallback = (done, data, caller) => {
+  console.log(`
+${caller}
+logging received data: ${JSON.stringify(data)}
+`);
   done(null, data);
 };
 

@@ -160,11 +160,10 @@ router.get("/:id/logs", (req, res, next) => {
           return next({ message: "Could not find Exercises by User" });
         }
 
+        // remap exercise dates to dateString
         exercises = exercises.map((exercise) => {
           return { ...exercise._doc, date: exercise.date.toDateString() };
         });
-
-        console.log(exercises);
 
         const result = {
           ...user,
@@ -172,6 +171,7 @@ router.get("/:id/logs", (req, res, next) => {
           log: exercises,
         };
 
+        console.log(`result: ${JSON.stringify(result)}`);
         res.json(result);
       });
     } catch (err) {
