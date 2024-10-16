@@ -133,10 +133,12 @@ router.get("/:id/logs", (req, res, next) => {
         limit: req.query.limit,
       };
 
-      const fromValidateErr = fromDate
+      const fromValidateErr = requestParams.fromDate
         ? validateDate(requestParams.fromDate)
         : null;
-      const toValidateErr = toDate ? validateDate(requestParams.toDate) : null;
+      const toValidateErr = requestParams.toDate
+        ? validateDate(requestParams.toDate)
+        : null;
 
       if (fromValidateErr || toValidateErr) {
         if (fromValidateErr) return next(fromValidateErr);
