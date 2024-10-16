@@ -121,10 +121,11 @@ router.post("/:_id/exercises", (req, res, next) => {
 
         const copiedData = {
           ...data._doc,
+          _id: data._doc.userId,
           date: data._doc.date.toDateString(),
         };
 
-        // delete copiedData["__v"];
+        delete copiedData["__v"];
         delete copiedData["userId"];
 
         console.log(`
