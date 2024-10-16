@@ -1,5 +1,17 @@
 # exercise-tracker
 
+## Installing
+
+```
+git clone --no-checkout https://github.com/mfukano/fcc.git
+cd fcc/
+git sparse-checkout init
+git sparse-checkout set backend-projects/exercise-tracker
+git checkout main
+npm i
+npm run server
+```
+
 ## What is this?
 
 This is an Exercise Tracker API server with a static front-end.
@@ -92,9 +104,6 @@ It was also useful implementing the pattern of writing simply for the database
 and implementing the handlers in the exported database functions' callbacks,
 though the handler logic is probably nicer to extract for readability as well.
 
-```javascript
-
 ## More information
 
-Further information about this project can be found on [FreeCodeCamp](https://www.freecodecamp.org/learn/back-end-development-and-apis/back-end-development-and-apis-projects/url-shortener-microservice).
-```
+Further information about this project can be found on [FreeCodeCamp](https://www.freecodecamp.org/learn/back-end-development-and-apis/back-end-development-and-apis-projects/exercise-tracker).
