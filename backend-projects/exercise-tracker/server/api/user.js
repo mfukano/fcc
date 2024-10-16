@@ -98,6 +98,8 @@ router.post("/:id/exercises", (req, res, next) => {
           console.error(postError);
           return next({ message: postError });
         }
+
+        requestParams.date = requestParams.date.toDateString();
         res.json(requestParams);
       });
     } catch (err) {
@@ -132,6 +134,12 @@ router.get("/:id/logs", (req, res, next) => {
           );
           return next({ message: "Could not find Exercises by User" });
         }
+
+        exercises = exercises.map((exercise) => {
+          return { ...exercise._doc, date: exercise.date.toDateString() };
+        });
+
+        console.log(exercises);
 
         const result = {
           ...user,
