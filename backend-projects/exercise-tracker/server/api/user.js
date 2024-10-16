@@ -76,37 +76,36 @@ router.post("/", (req, res, next) => {
   });
 });
 
-router.post("/:id/exercises", (req, res, next) => {
-  let t = handleTimeout(next);
-  findUserById(req.params.id, (err, user) => {
-    if (err || !user) {
+router.post("/:_id/exercises", (req, res, next) => {
+  const { description, duration, date } = req.body;
+  const dateValidateErr = date ? validateDate(date) : null;
+  const stringValidateErr = validateString(description);
+
+  if (stringValidateErr || dateValidateErr) {
+    if (stringValidateErr) return next(stringValidateErr);
+    if (dateValidateErr) return next(dateValidateErr);
+  }
+
+  const t = handleTimeout(next);
+
+  findUserById(req.params._id, (err, user) => {
+    if (err) {
       return next(err);
     }
 
+    if (!user && (user.username || !user._id)) {
+      return next("Couldn't get username or _id from requested ID");
+    }
+
+    const requestParams = {
+      username: user.username,
+      _id: user._id,
+      description,
+      duration: parseInt(duration),
+      date: date ? new Date(date) : new Date(),
+    };
+
     try {
-      const { description, duration, date } = req.body;
-      const dateValidateErr = date ? validateDate(date) : null;
-      const stringValidateErr = validateString(description);
-
-      if (stringValidateErr || dateValidateErr) {
-        if (stringValidateErr) return next(stringValidateErr);
-        if (dateValidateErr) return next(dateValidateErr);
-      }
-
-      // expecting to need to extract user._doc
-      console.log(`check user before post: ${JSON.stringify(user)}`);
-
-      if (!user && (user.username || !user._id)) {
-        return next("Couldn't get username or _id from requested ID");
-      }
-
-      const requestParams = {
-        username: user.username,
-        _id: user._id,
-        description,
-        duration: parseInt(duration),
-        date: date ? new Date(date) : new Date(),
-      };
       createAndSaveExercise(requestParams, (err, data) => {
         clearTimeout(t);
         if (err) {
@@ -120,8 +119,6 @@ router.post("/:id/exercises", (req, res, next) => {
           return next({ message: postError });
         }
 
-        console.log(`check data: ${JSON.stringify(data)}`);
-
         const copiedData = {
           ...data._doc,
           date: data._doc.date.toDateString(),
@@ -131,7 +128,7 @@ router.post("/:id/exercises", (req, res, next) => {
         delete copiedData["userId"];
 
         console.log(`
-POST /api/:id/exercises result:
+POST /api/users/:id/exercises result:
 -------------------------------
 ${JSON.stringify(copiedData)}
         `);
@@ -144,34 +141,32 @@ ${JSON.stringify(copiedData)}
   });
 });
 
-router.get("/:id/logs", (req, res, next) => {
-  let t = handleTimeout(next);
-  findUserById(req.params.id, (err, user) => {
+router.get("/:_id/logs", (req, res, next) => {
+  const requestParams = {
+    fromDate: req.query.from ? req.query.from : null,
+    toDate: req.query.to ? req.query.to : null,
+    limit: req.query.limit,
+  };
+  const fromValidateErr = requestParams.fromDate
+    ? validateDate(requestParams.fromDate)
+    : null;
+  const toValidateErr = requestParams.toDate
+    ? validateDate(requestParams.toDate)
+    : null;
+
+  if (fromValidateErr || toValidateErr) {
+    if (fromValidateErr) return next(fromValidateErr);
+    if (toValidateErr) return next(toValidateErr);
+  }
+  const t = handleTimeout(next);
+
+  findUserById(req.params._id, (err, user) => {
     if (err || !user) {
       return next(err);
     }
-
     user = user._doc;
 
     try {
-      const requestParams = {
-        fromDate: req.query.from ? req.query.from : null,
-        toDate: req.query.to ? req.query.to : null,
-        limit: req.query.limit,
-      };
-
-      const fromValidateErr = requestParams.fromDate
-        ? validateDate(requestParams.fromDate)
-        : null;
-      const toValidateErr = requestParams.toDate
-        ? validateDate(requestParams.toDate)
-        : null;
-
-      if (fromValidateErr || toValidateErr) {
-        if (fromValidateErr) return next(fromValidateErr);
-        if (toValidateErr) return next(toValidateErr);
-      }
-
       console.log(
         `check requestParams before find by filters: ${JSON.stringify(requestParams)}`,
       );
@@ -199,7 +194,7 @@ router.get("/:id/logs", (req, res, next) => {
         };
 
         console.log(`
-GET /api/:id/logs result to return: 
+GET /api/users/:id/logs result to return: 
 ${JSON.stringify(result)}
         `);
 
