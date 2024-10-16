@@ -112,7 +112,15 @@ router.post("/:id/exercises", (req, res, next) => {
           return next({ message: postError });
         }
 
-        res.json({ ...requestParams, date: requestParams.date.toDateString() });
+        const copiedData = {
+          ...data._doc,
+          date: data._doc.date.toDateString(),
+        };
+
+        delete copiedData["__v"];
+        delete copiedData["userId"];
+
+        res.json(copiedData);
       });
     } catch (err) {
       return next(err);
