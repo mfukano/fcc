@@ -30,6 +30,7 @@ const logger = (req, _, next) => {
 LOGGING MIDDLEWARE
 ---------------------
 method: ${req.method}
+req.path: ${req.path}
 req.params: ${JSON.stringify(req.params)}
 req.query: ${JSON.stringify(req.query)}
 req.body: ${JSON.stringify(req.body)}

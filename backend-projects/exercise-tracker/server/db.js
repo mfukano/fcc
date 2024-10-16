@@ -102,23 +102,20 @@ const findExercisesById = (userId, requestParams, done) => {
   // toDate might act weird if filter.date is null but I should test.
   if (fromDate && toDate) {
     filter = {
-      $or: [
-        {
-          $and: [
-            { date: { $gte: new Date(fromDate).toISOString() } },
-            { date: { $lte: new Date(toDate).toISOString() } },
-          ],
-        },
-        { userId },
-      ],
+      userId,
+      date: {
+        $gt: new Date(fromDate),
+        $lt: new Date(toDate),
+      },
     };
   } else {
     filter = { userId };
+
     if (fromDate) {
-      filter.date = { $gte: new Date(fromDate).toISOString() };
+      filter.date = { $gte: new Date(fromDate) };
     }
     if (toDate) {
-      filter.date = { $lte: new Date(toDate).toISOString() };
+      filter.date = { $lte: new Date(toDate) };
     }
   }
   console.log(`filter: ${JSON.stringify(filter)}`);
@@ -126,9 +123,10 @@ const findExercisesById = (userId, requestParams, done) => {
   Exercise.find(filter)
     .limit(limit ? limit : Number.MAX_VALUE)
     .select("date duration description -_id")
-    .then((err, foundExercises) =>
+    .then((foundExercises) =>
       handleCallback(done, foundExercises, "findExercisesById"),
-    );
+    )
+    .catch((err) => logErr(err));
 };
 
 /* helper functions */
