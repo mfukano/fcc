@@ -133,7 +133,7 @@ const handleCallback = (done, data, caller) => {
   console.log(`
 ${caller} handleCallback LOG
 ----------------------------
-logging received data: ${JSON.stringify(data)}
+received data: ${JSON.stringify(data)}
 `);
   done(null, data);
 };

@@ -43,7 +43,6 @@ router.get("/:id", (req, res, next) => {
 });
 
 router.post("/", (req, res, next) => {
-  console.log(`check post request body: ${JSON.stringify(req.body)}`);
   const username = req.body.username;
   const validateErr = validateString(username);
 
