@@ -35,7 +35,6 @@ let Exercise = mongoose.model("Exercise", exerciseSchema);
  **/
 
 const createAndSaveUser = (username, done) => {
-  console.log(`check received username: ${username}`);
   new User({ username })
     .save()
     .then((createdUser) =>
@@ -73,9 +72,9 @@ const createAndSaveExercise = (
     username,
     description,
     duration,
-    date,
+    date: new Date(date).toISOString(),
   });
-  console.log(`check exercise before save: ${JSON.stringify(exercise)}`);
+
   exercise
     .save()
     .then((savedExercise) =>
@@ -104,25 +103,25 @@ const findExercisesById = (userId, requestParams, done) => {
     filter = {
       userId,
       date: {
-        $gt: new Date(fromDate),
-        $lt: new Date(toDate),
+        $gt: new Date(fromDate).toISOString(),
+        $lt: new Date(toDate).toISOString(),
       },
     };
   } else {
     filter = { userId };
 
     if (fromDate) {
-      filter.date = { $gte: new Date(fromDate) };
+      filter.date = { $gte: new Date(fromDate).toISOString() };
     }
     if (toDate) {
-      filter.date = { $lte: new Date(toDate) };
+      filter.date = { $lte: new Date(toDate).toISOString() };
     }
   }
   console.log(`filter: ${JSON.stringify(filter)}`);
 
   Exercise.find(filter)
-    .limit(limit ? limit : Number.MAX_VALUE)
     .select("date duration description -_id")
+    .limit(limit ? limit : Number.MAX_VALUE)
     .then((foundExercises) =>
       handleCallback(done, foundExercises, "findExercisesById"),
     )
@@ -133,7 +132,8 @@ const findExercisesById = (userId, requestParams, done) => {
 
 const handleCallback = (done, data, caller) => {
   console.log(`
-${caller}
+${caller} handleCallback LOG
+----------------------------
 logging received data: ${JSON.stringify(data)}
 `);
   done(null, data);

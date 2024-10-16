@@ -120,6 +120,12 @@ router.post("/:id/exercises", (req, res, next) => {
         delete copiedData["__v"];
         delete copiedData["userId"];
 
+        console.log(`
+POST /api/:id/exercises result:
+-------------------------------
+${JSON.stringify(copiedData)}
+        `);
+
         res.json(copiedData);
       });
     } catch (err) {
@@ -179,7 +185,11 @@ router.get("/:id/logs", (req, res, next) => {
           log: exercises,
         };
 
-        console.log(`result: ${JSON.stringify(result)}`);
+        console.log(`
+GET /api/:id/logs result to return: 
+${JSON.stringify(result)}
+        `);
+
         res.json(result);
       });
     } catch (err) {
