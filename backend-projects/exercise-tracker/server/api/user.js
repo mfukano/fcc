@@ -84,7 +84,7 @@ router.post("/:id/exercises", (req, res, next) => {
     }
     try {
       const { description, duration, date } = req.body;
-      const dateValidateErr = validateDate(date);
+      const dateValidateErr = date ? validateDate(date) : null;
       const stringValidateErr = validateString(description);
 
       if (stringValidateErr || dateValidateErr) {
@@ -97,7 +97,7 @@ router.post("/:id/exercises", (req, res, next) => {
         _id: user._id,
         description,
         duration,
-        date: new Date(date) || new Date(),
+        date: date ? new Date(date) : new Date(),
       };
       createAndSaveExercise(requestParams, (err, data) => {
         clearTimeout(t);
@@ -133,8 +133,10 @@ router.get("/:id/logs", (req, res, next) => {
         limit: req.query.limit,
       };
 
-      const fromValidateErr = validateDate(requestParams.fromDate);
-      const toValidateErr = validateDate(requestParams.toDate);
+      const fromValidateErr = fromDate
+        ? validateDate(requestParams.fromDate)
+        : null;
+      const toValidateErr = toDate ? validateDate(requestParams.toDate) : null;
 
       if (fromValidateErr || toValidateErr) {
         if (fromValidateErr) return next(fromValidateErr);
