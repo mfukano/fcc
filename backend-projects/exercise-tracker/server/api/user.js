@@ -156,7 +156,7 @@ router.get("/:id/logs", (req, res, next) => {
     try {
       const requestParams = {
         fromDate: req.query.from ? req.query.from : null,
-        toDate: req.query.to ? req.query.from : null,
+        toDate: req.query.to ? req.query.to : null,
         limit: req.query.limit,
       };
 

@@ -103,18 +103,18 @@ const findExercisesById = (userId, requestParams, done) => {
     filter = {
       userId,
       date: {
-        $gt: new Date(fromDate).toISOString(),
-        $lt: new Date(toDate).toISOString(),
+        $gte: new Date(fromDate),
+        $lte: new Date(toDate),
       },
     };
   } else {
     filter = { userId };
 
     if (fromDate) {
-      filter.date = { $gte: new Date(fromDate).toISOString() };
+      filter.date = { $gte: new Date(fromDate) };
     }
     if (toDate) {
-      filter.date = { $lte: new Date(toDate).toISOString() };
+      filter.date = { $lte: new Date(toDate) };
     }
   }
   console.log(`filter: ${JSON.stringify(filter)}`);
