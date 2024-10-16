@@ -44,11 +44,15 @@ router.get("/:_id", (req, res, next) => {
 router.post("/", (req, res, next) => {
   console.log(`check post request body: ${JSON.stringify(req.body)}`);
   const username = req.body.username;
-  validateString(username, next);
+  const validateErr = validateString(username);
 
   if (!username) {
     return next("No username provided to /api/users");
   }
+  if (validateErr) {
+    return next(validateErr);
+  }
+
   let t = handleTimeout(next);
   createAndSaveUser(username, (err, user) => {
     clearTimeout(t);
@@ -80,8 +84,13 @@ router.post("/:id/exercises", (req, res, next) => {
     }
     try {
       const { description, duration, date } = req.body;
-      validateDate(date, next);
-      validateString(description, next);
+      const dateValidateErr = validateDate(date);
+      const stringValidateErr = validateString(description);
+
+      if (stringValidateErr || dateValidateErr) {
+        if (stringValidateErr) return next(stringValidateErr);
+        if (dateValidateErr) return next(dateValidateErr);
+      }
 
       const requestParams = {
         username: user.username,
@@ -124,8 +133,13 @@ router.get("/:id/logs", (req, res, next) => {
         limit: req.query.limit,
       };
 
-      validateDate(requestParams.fromDate, next);
-      validateDate(requestParams.toDate, next);
+      const fromValidateErr = validateDate(requestParams.fromDate);
+      const toValidateErr = validateDate(requestParams.toDate);
+
+      if (fromValidateErr || toValidateErr) {
+        if (fromValidateErr) return next(fromValidateErr);
+        if (toValidateErr) return next(toValidateErr);
+      }
 
       console.log(
         `check requestParams before find by filters: ${JSON.stringify(requestParams)}`,
@@ -172,16 +186,21 @@ const handleTimeout = (callback) => {
   }, TIMEOUT);
 };
 
-const validateDate = (date, next) => {
+const validateDate = (date) => {
   if (date && new Date(date) == "Invalid Date") {
-    return next("Invalid Date");
+    return "Invalid Date";
   }
 };
 
-const validateString = (str, next) => {
-  if (str && str.match(/[^a-zA-Z0-9:]/g)) {
-    return next("Some string param is not valid");
+const validateString = (str) => {
+  if (!str) {
+    return "Missing required string";
   }
+  if (str && str.match(/[^a-zA-Z0-9:]/g)) {
+    return "Some string param is not valid";
+  }
+
+  return null;
 };
 
 export default router;
