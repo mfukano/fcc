@@ -44,6 +44,7 @@ router.get("/:_id", (req, res, next) => {
 router.post("/", (req, res, next) => {
   console.log(`check post request body: ${JSON.stringify(req.body)}`);
   const username = req.body.username;
+  validateString(username, next);
 
   if (!username) {
     return next("No username provided to /api/users");
@@ -79,6 +80,9 @@ router.post("/:id/exercises", (req, res, next) => {
     }
     try {
       const { description, duration, date } = req.body;
+      validateDate(date, next);
+      validateString(description, next);
+
       const requestParams = {
         username: user.username,
         _id: user._id,
@@ -119,6 +123,10 @@ router.get("/:id/logs", (req, res, next) => {
         toDate: req.query.to,
         limit: req.query.limit,
       };
+
+      validateDate(requestParams.fromDate, next);
+      validateDate(requestParams.toDate, next);
+
       console.log(
         `check requestParams before find by filters: ${JSON.stringify(requestParams)}`,
       );
@@ -162,6 +170,18 @@ const handleTimeout = (callback) => {
   return setTimeout(() => {
     callback({ message: "timeout" });
   }, TIMEOUT);
+};
+
+const validateDate = (date, next) => {
+  if (date && new Date(date) == "Invalid Date") {
+    return next("Invalid Date");
+  }
+};
+
+const validateString = (str, next) => {
+  if (str && str.match(/[^a-zA-Z0-9:]/g)) {
+    return next("Some string param is not valid");
+  }
 };
 
 export default router;
