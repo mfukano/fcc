@@ -196,7 +196,7 @@ const validateString = (str) => {
   if (!str) {
     return "Missing required string";
   }
-  if (str && str.match(/[^a-zA-Z0-9:]/g)) {
+  if (str && str.match(/[^a-zA-Z0-9\_\-:]/g)) {
     return "Some string param is not valid";
   }
 
