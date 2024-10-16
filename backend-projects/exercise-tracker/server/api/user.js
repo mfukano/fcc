@@ -124,7 +124,7 @@ router.post("/:_id/exercises", (req, res, next) => {
           date: data._doc.date.toDateString(),
         };
 
-        delete copiedData["__v"];
+        // delete copiedData["__v"];
         delete copiedData["userId"];
 
         console.log(`
