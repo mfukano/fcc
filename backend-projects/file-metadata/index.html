@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title></title>
+    <link href="style.css" rel="stylesheet" />
+  </head>
+  <body>
+    <h1>File Metadata Reader</h1>
+    <h2>Usage:</h2>
+    <p>Please upload a file.</p>
+    <div class="container">
+      <h3 id="output"></h3>
+      <div class="row">
+        <form
+          id="file-form"
+          enctype="multipart/form-data"
+          method="POST"
+          action="/api/upload"
+        >
+          <input id="file-upload-btn" name="upfile" type="file" />
+          <!-- input id="button" type="submit" value="Upload" /-->
+          <button id="submit">Upload</button>
+        </form>
+      </div>
+    </div>
+    <script>
+      const formData = new FormData();
+      const fileForm = document.querySelector("#file-form");
+
+      fileForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const fileInput = document.querySelector("#file-upload-btn");
+
+        const file = fileInput.files[0];
+        formData.append("file", file, file.name);
+        formData.append("filename", file.name);
+
+        const response = await fetch("http://localhost:4000/api/upload", {
+          method: "POST",
+          body: formData,
+        });
+        return await response.json();
+      });
+    </script>
+  </body>
+</html>
