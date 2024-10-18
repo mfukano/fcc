@@ -11,13 +11,13 @@
     <h2>Usage:</h2>
     <p>Please upload a file.</p>
     <div class="container">
-      <h3 id="output"></h3>
+      <p id="output"></p>
       <div class="row">
         <form
           id="file-form"
           enctype="multipart/form-data"
           method="POST"
-          action="/api/upload"
+          action="/api/fileanalyse"
         >
           <input id="file-upload-btn" name="upfile" type="file" />
           <!-- input id="button" type="submit" value="Upload" /-->
@@ -28,11 +28,11 @@
     <script>
       const formData = new FormData();
       const fileForm = document.querySelector("#file-form");
+      const output = document.querySelector("#output");
 
       fileForm.addEventListener("submit", async (e) => {
         e.preventDefault();
         const fileInput = document.querySelector("#file-upload-btn");
-
         const file = fileInput.files[0];
         formData.append("upfile", file, file.name);
         formData.append("filename", file.name);
@@ -41,7 +41,9 @@
           method: "POST",
           body: formData,
         });
-        return await response.json();
+
+        const json = await response.json();
+        output.innerHTML = `<pre><code>${JSON.stringify(json, null, "\t")}</code></pre>`;
       });
     </script>
   </body>
