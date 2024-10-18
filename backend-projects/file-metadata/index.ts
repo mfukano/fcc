@@ -21,9 +21,9 @@ path: ${path}
     if (req.method === "OPTIONS") {
       return new Response(null, { status: 204, headers: CORS_HEADERS.headers });
     }
-
     if (path === "/") return new Response(Bun.file("index.html"), CORS_HEADERS);
-
+    if (path === "/style.css")
+      return new Response(Bun.file("./style.css"), CORS_HEADERS);
     if (path === "/api/fileanalyse") {
       const formData = await req.formData();
 
@@ -36,14 +36,15 @@ path: ${path}
       const writtenFile = Bun.file(`${REC_FILES_PATH}/${filename}`);
       const writtenFileBytes = await writtenFile.bytes();
 
-      return Response.json(
-        {
-          name: filename,
-          size: writtenFileBytes.length,
-          type: writtenFile.type,
-        },
-        CORS_HEADERS,
-      );
+      const responseObject = {
+        name: filename,
+        size: writtenFileBytes.length,
+        type: writtenFile.type,
+      };
+
+      console.log(`created responseObject to return:
+${JSON.stringify(responseObject)}`);
+      return Response.json(responseObject, CORS_HEADERS);
     }
 
     if (path === "/cleanup") {
