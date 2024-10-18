@@ -38,7 +38,7 @@ path: ${path}
 
       return Response.json(
         {
-          name: writtenFile.name,
+          name: filename,
           size: writtenFileBytes.length,
           type: writtenFile.type,
         },
