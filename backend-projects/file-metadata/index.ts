@@ -11,6 +11,11 @@ const server = Bun.serve({
   async fetch(req) {
     const path = new URL(req.url).pathname;
 
+    console.log(`
+RECEIVED ${req.method.toUpperCase()} REQUEST:
+path: ${path}
+`);
+
     if (req.method === "OPTIONS") {
       return new Response(null, { status: 204, headers: CORS_HEADERS });
     }
