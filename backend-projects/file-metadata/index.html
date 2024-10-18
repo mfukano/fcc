@@ -34,10 +34,10 @@
         const fileInput = document.querySelector("#file-upload-btn");
 
         const file = fileInput.files[0];
-        formData.append("file", file, file.name);
+        formData.append("upfile", file, file.name);
         formData.append("filename", file.name);
 
-        const response = await fetch("http://localhost:4000/api/upload", {
+        const response = await fetch("http://localhost:4000/api/fileanalyse", {
           method: "POST",
           body: formData,
         });
