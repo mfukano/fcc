@@ -1,8 +1,10 @@
 const REC_FILES_PATH = `./received_files`;
 const CORS_HEADERS = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "OPTIONS, GET, POST",
-  "Access-Control-Allow-Headers": "Content-Type",
+  headers: {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "OPTIONS, GET, POST",
+    "Access-Control-Allow-Headers": "Content-Type",
+  },
 };
 
 console.log("Hello via Bun!");
@@ -17,15 +19,15 @@ path: ${path}
 `);
 
     if (req.method === "OPTIONS") {
-      return new Response(null, { status: 204, headers: CORS_HEADERS });
+      return new Response(null, { status: 204, headers: CORS_HEADERS.headers });
     }
 
-    if (path === "/") return new Response(Bun.file("index.html"));
+    if (path === "/") return new Response(Bun.file("index.html"), CORS_HEADERS);
 
-    if (path === "/api/upload") {
+    if (path === "/api/fileanalyse") {
       const formData = await req.formData();
 
-      const uploadedFile = formData.get("file");
+      const uploadedFile = formData.get("upfile");
       const filename = formData.get("filename");
 
       if (!uploadedFile) throw new Error("Must upload a file");
@@ -34,18 +36,13 @@ path: ${path}
       const writtenFile = Bun.file(`${REC_FILES_PATH}/${filename}`);
       const writtenFileBytes = await writtenFile.bytes();
 
-      return new Response(
-        JSON.stringify({
+      return Response.json(
+        {
           name: writtenFile.name,
           size: writtenFileBytes.length,
           type: writtenFile.type,
-        }),
-        {
-          headers: {
-            ...CORS_HEADERS,
-            "Content-Type": "application/json",
-          },
         },
+        CORS_HEADERS,
       );
     }
 
