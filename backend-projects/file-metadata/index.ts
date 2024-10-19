@@ -1,57 +1,45 @@
-const REC_FILES_PATH = `./received_files`;
-const CORS_HEADERS = {
-  headers: {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "OPTIONS, GET, POST",
-    "Access-Control-Allow-Headers": "Content-Type",
-  },
-};
+import { Hono, type Context } from "hono";
+import { serveStatic } from "hono/bun";
 
-console.log("Hello via Bun!");
-const server = Bun.serve({
-  port: 4000,
-  async fetch(req) {
-    const path = new URL(req.url).pathname;
+interface SimpleError {
+	message: String,
+}
 
-    console.log(`
-RECEIVED ${req.method.toUpperCase()} REQUEST:
-path: ${path}
-`);
+const app = new Hono();
 
-    if (req.method === "OPTIONS") {
-      return new Response(null, { status: 204, headers: CORS_HEADERS.headers });
-    }
-    if (path === "/") return new Response(Bun.file("index.html"), CORS_HEADERS);
-    if (path === "/style.css")
-      return new Response(Bun.file("./style.css"), CORS_HEADERS);
-    if (path === "/api/fileanalyse") {
-      const formData = await req.formData();
+app.use("/", serveStatic({ path: "./index.html" }));
+app.use("/style.css", serveStatic({ path: "./style.css" }));
 
-      const uploadedFile = formData.get("upfile");
-      const filename = formData.get("filename");
-
-      if (!uploadedFile) throw new Error("Must upload a file");
-      await Bun.write(`${REC_FILES_PATH}/${filename}`, uploadedFile);
-
-      const writtenFile = Bun.file(`${REC_FILES_PATH}/${filename}`);
-      const writtenFileBytes = await writtenFile.bytes();
-
-      const responseObject = {
-        name: filename,
-        size: writtenFileBytes.length,
-        type: writtenFile.type,
-      };
-
-      console.log(`created responseObject to return:
-${JSON.stringify(responseObject)}`);
-      return Response.json(responseObject, CORS_HEADERS);
-    }
-
-    if (path === "/cleanup") {
-      await Bun.$`rm -rf ${REC_FILES_PATH}/*`;
-      console.log("done");
-    }
-
-    return new Response("Not Found", { status: 404 });
-  },
+app.post("/api/fileanalyse", async (c) => {
+	try {
+		const fileMetadata = await parseMultipartForm(c.req);
+		return c.json(fileMetadata);
+	} catch (error: unknown) {
+		const e = error as SimpleError;
+		return c.json({ error: e.message }, 400);
+	}
 });
+
+async function parseMultipartForm(req: Context["req"]) {
+	const body = await req.parseBody();
+	const file = body['upfile'] as File;
+	if (!file) throw new Error("No file uploaded");
+
+	try {
+		console.log(`log file attrs:
+			file.name: ${file.name} 
+			file.size: ${file.size} 
+			file.type: ${file.type}`
+			.replace(/^[ \t]+/gm, "")
+		);
+		return { name: file.name, size: file.size, type: file.type }
+	} catch (e) {
+		console.error(`Error: ${e}`)
+		return { message: e }
+	}
+}
+
+export default {
+	port: 4001,
+	fetch: app.fetch,
+}
