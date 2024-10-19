@@ -35,18 +35,8 @@ async function parseMultipartForm(req: Context["req"]) {
   const file = body["upfile"] as File;
   if (!file) throw new Error("No file uploaded");
 
-  try {
-    console.log(
-      `log file attrs:
-			file.name: ${file.name} 
-			file.size: ${file.size} 
-			file.type: ${file.type}`.replace(/^[ \t]+/gm, ""),
-    );
-    return { name: file.name, size: file.size, type: file.type };
-  } catch (e) {
-    console.error(`Error: ${e}`);
-    return { message: e };
-  }
+  const { name, size, type } = file;
+  return { name, size, type };
 }
 
 export default {
