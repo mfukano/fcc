@@ -8,7 +8,10 @@
     "typescript": "^5.0.0"
   },
   "scripts": {
-    "start": "bun --hot run index.ts"
+    "start": "bun run --hot index.ts"
   },
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "hono": "^4.6.5"
+  }
 }
