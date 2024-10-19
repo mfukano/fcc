@@ -20,31 +20,9 @@
           action="/api/fileanalyse"
         >
           <input id="file-upload-btn" name="upfile" type="file" />
-          <!-- input id="button" type="submit" value="Upload" /-->
-          <button id="submit">Upload</button>
+          <input id="button" type="submit" value="Upload" />
         </form>
       </div>
     </div>
-    <script>
-      const formData = new FormData();
-      const fileForm = document.querySelector("#file-form");
-      const output = document.querySelector("#output");
-
-      fileForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const fileInput = document.querySelector("#file-upload-btn");
-        const file = fileInput.files[0];
-        formData.append("upfile", file, file.name);
-        formData.append("filename", file.name);
-
-        const response = await fetch("http://localhost:4000/api/fileanalyse", {
-          method: "POST",
-          body: formData,
-        });
-
-        const json = await response.json();
-        output.innerHTML = `<pre><code>${JSON.stringify(json, null, "\t")}</code></pre>`;
-      });
-    </script>
   </body>
 </html>
