@@ -8,8 +8,8 @@
     "typescript": "^5.0.0"
   },
   "scripts": {
-    "hono": "bun run --hot hono.ts",
-    "bunserv": "bun run --hot bunserv.ts"
+    "hono": "bun run --hot ./server/hono.ts",
+    "bunserv": "bun run --hot ./server/bunserv.ts"
   },
   "type": "module",
   "dependencies": {

@@ -60,7 +60,7 @@ and it was very straightforward, coming from my last project in Express.
 Hono abstracts a number of things for us:
 
 - Middleware handling
-- Static file serving
+- Static file serving, with intuitive paths
 - Handler separation by verb and path
 - Simplifying request handling into a Context
 
